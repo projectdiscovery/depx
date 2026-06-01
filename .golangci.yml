@@ -1,0 +1,12 @@
+version: "2"
+
+run:
+  timeout: 30m
+
+linters:
+  default: standard
+  disable:
+    # TODO: enable after errcheck/unused/staticcheck cleanup pass
+    - errcheck
+    - unused
+    - staticcheck

@@ -1,0 +1,16 @@
+# Binaries
+/bin/
+/dist/
+/depx
+/cmd/depx/depx
+
+# Test & build output
+*.test
+*.out
+coverage.txt
+
+# Local cache
+/.cache/
+
+# OS files
+.DS_Store
