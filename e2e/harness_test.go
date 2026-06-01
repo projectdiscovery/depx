@@ -116,7 +116,7 @@ func (r *e2eRunner) runWithStdin(stdin string, args ...string) (stdout string, e
 
 func devNullStdin(t *testing.T) *os.File {
 	t.Helper()
-	f, err := os.Open("/dev/null")
+	f, err := os.Open(os.DevNull)
 	if err != nil {
 		t.Fatal(err)
 	}

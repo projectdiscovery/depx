@@ -7,6 +7,7 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"path/filepath"
 	"strings"
 	"time"
 )
@@ -298,10 +299,7 @@ func writeCache(path string, body []byte) error {
 }
 
 func dirOf(path string) string {
-	if i := strings.LastIndex(path, "/"); i >= 0 {
-		return path[:i]
-	}
-	return "."
+	return filepath.Dir(path)
 }
 
 func status(opts FetchOptions, msg string) {

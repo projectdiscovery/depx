@@ -92,7 +92,7 @@ func DisplayOwners(repos []Repo) []string {
 }
 
 func (r Repo) CachePath(cacheDir string) string {
-	return fmt.Sprintf("%s/github/%s/%s/sbom.spdx.json", strings.TrimRight(cacheDir, "/"), r.Owner, r.Name)
+	return filepath.Join(cacheDir, "github", r.Owner, r.Name, "sbom.spdx.json")
 }
 
 // Target is a GitHub repository or an org/user to expand into repositories.
@@ -288,6 +288,11 @@ func isValidRepoName(s string) bool {
 
 func looksLikeFilesystemPath(input string) bool {
 	if strings.HasPrefix(input, "~") {
+		return true
+	}
+	// Treat a leading slash as a Unix-style absolute path regardless of host OS
+	// (filepath.IsAbs is false for "/foo" on Windows).
+	if strings.HasPrefix(input, "/") {
 		return true
 	}
 	if filepath.IsAbs(input) {

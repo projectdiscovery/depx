@@ -21,7 +21,7 @@ func TestEnrichFinding(t *testing.T) {
 	if f.ProjectDir != projectDir {
 		t.Fatalf("ProjectDir = %q, want %q", f.ProjectDir, projectDir)
 	}
-	if !strings.HasPrefix(f.ProjectURL, "file://") || !strings.Contains(f.ProjectURL, projectDir) {
+	if !strings.HasPrefix(f.ProjectURL, "file://") || !strings.Contains(f.ProjectURL, filepath.ToSlash(projectDir)) {
 		t.Fatalf("ProjectURL = %q", f.ProjectURL)
 	}
 	if f.PackageURL != "https://www.npmjs.com/package/evil-pkg" {

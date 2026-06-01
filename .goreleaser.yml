@@ -7,6 +7,9 @@ before:
 builds:
   - env:
       - CGO_ENABLED=0
+    ldflags:
+      - -s -w
+      - -X github.com/projectdiscovery/depx/internal/cli.Version=v{{ .Version }}
     goos:
       - windows
       - linux
