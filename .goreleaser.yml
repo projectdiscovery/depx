@@ -29,6 +29,9 @@ checksum:
   algorithm: sha256
 
 announce:
+  # Only announce when both webhook secrets are configured (skips on test/internal
+  # releases where they are unset, so no Slack/Discord notifications go out).
+  skip: '{{ if and (index .Env "SLACK_WEBHOOK") (index .Env "DISCORD_WEBHOOK_TOKEN") }}false{{ else }}true{{ end }}'
   slack:
     enabled: true
     channel: '#release'
