@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "depx error response",
+  "type": "object",
+  "required": ["schema_version", "command", "depx_version", "data"],
+  "properties": {
+    "schema_version": { "const": "1" },
+    "command": { "const": "error" },
+    "depx_version": { "type": "string" },
+    "data": {
+      "type": "object",
+      "required": ["error", "code", "message"],
+      "properties": {
+        "error": { "const": true },
+        "code": { "type": "integer" },
+        "message": { "type": "string" }
+      }
+    }
+  }
+}

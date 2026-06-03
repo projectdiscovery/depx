@@ -1,0 +1,49 @@
+version: 2
+
+before:
+  hooks:
+    - bash scripts/goreleaser-prebuild.sh
+
+release:
+  mode: replace
+
+builds:
+  - env:
+      - CGO_ENABLED=0
+    ldflags:
+      - -s -w
+      - -X github.com/projectdiscovery/depx/internal/cli.Version=v{{ .Version }}
+    goos:
+      - windows
+      - linux
+      - darwin
+    goarch:
+      - amd64
+      - arm64
+    ignore:
+      - goos: windows
+        goarch: arm64
+    binary: depx
+    main: cmd/depx/main.go
+
+archives:
+  - formats:
+      - zip
+    name_template: '{{ .ProjectName }}_{{ .Version }}_{{ if eq .Os "darwin" }}macOS{{ else }}{{ .Os }}{{ end }}_{{ .Arch }}'
+
+checksum:
+  algorithm: sha256
+
+announce:
+  # Only announce when both webhook secrets are configured (skips on test/internal
+  # releases where they are unset, so no Slack/Discord notifications go out).
+  skip: '{{ if and (index .Env "SLACK_WEBHOOK") (index .Env "DISCORD_WEBHOOK_TOKEN") }}false{{ else }}true{{ end }}'
+  slack:
+    enabled: true
+    channel: '#release'
+    username: GoReleaser
+    message_template: 'New Release: {{ .ProjectName }} {{ .Tag }} is published! Check it out at {{ .ReleaseURL }}'
+
+  discord:
+    enabled: true
+    message_template: '**New Release: {{ .ProjectName }} {{ .Tag }}** is published! Check it out at {{ .ReleaseURL }}'
