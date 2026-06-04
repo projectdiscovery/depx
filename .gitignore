@@ -18,3 +18,7 @@ coverage.txt
 
 # OS files
 .DS_Store
+
+# Force-track repo essentials (may be ignored by ~/.gitignore_global)
+!Makefile
+!LICENSE
