@@ -63,7 +63,7 @@ func (c *Client) npmStatus(ctx context.Context, pkg ref.PackageRef) (*Status, er
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	if resp.StatusCode == http.StatusNotFound {
 		return &Status{Status: "not_found"}, nil
@@ -106,7 +106,7 @@ func (c *Client) pypiStatus(ctx context.Context, pkg ref.PackageRef) (*Status, e
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	if resp.StatusCode == http.StatusNotFound {
 		return &Status{Status: "not_found"}, nil

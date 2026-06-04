@@ -143,7 +143,7 @@ func assertFeedCardDetailOrder(t *testing.T, out string) {
 	if pub < 0 || pkg < 0 || withdrawn < 0 || osvLine < 0 {
 		t.Fatalf("missing expected detail lines:\n%s", out)
 	}
-	if !(pub < pkg && pkg < withdrawn && withdrawn <= osvLine) {
+	if pub >= pkg || pkg >= withdrawn || withdrawn > osvLine {
 		t.Fatalf("expected Published → Package → Withdrawn/OSV order:\n%s", out)
 	}
 }

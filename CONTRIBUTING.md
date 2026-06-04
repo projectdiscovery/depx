@@ -23,11 +23,19 @@ export DEPX_MODIFIED_INDEX_URL=http://127.0.0.1:8080/modified_id.csv
 
 ## Before opening a PR
 
-1. `make fmt-check` — code must be gofmt-clean
-2. `make vet` — `go vet ./...`
-3. `make test` — unit tests
-4. `make lint` — golangci-lint (same config as CI)
-5. `make vulncheck` — `govulncheck ./...` (no new reachable vulns in depx-owned code paths; known transitive findings from `osv-scalibr` → docker/go-git are tracked upstream)
+Run the full local CI gate:
+
+```bash
+make ci
+```
+
+This runs `fmt-check`, `lint`, `vulncheck`, `build`, `test`, and race checks — the same jobs as `.github/workflows/build-test.yml`.
+
+Individual targets: `make fmt-check`, `make lint`, `make vulncheck`, `make test`.
+
+`make lint` downloads the official golangci-lint binary (`v2.5.0+`, built with Go 1.25). A Homebrew or `go install` linter built with Go 1.24 will fail against this repo's `go 1.25` module.
+
+`make vulncheck` — no new reachable vulns in depx-owned code paths; known transitive findings from `osv-scalibr` → docker/go-git are tracked upstream.
 
 End-to-end tests live under `e2e/` and run with the main test suite.
 

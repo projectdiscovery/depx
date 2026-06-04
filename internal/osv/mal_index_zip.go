@@ -150,7 +150,7 @@ func (c *Client) getVulnGCS(ctx context.Context, ecosystem, id string) (*Vulnera
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 	if resp.StatusCode != http.StatusOK {
 		return nil, fmt.Errorf("gcs vuln %s: status %d", id, resp.StatusCode)
 	}
@@ -183,7 +183,7 @@ func (c *Client) loadMALFromEcosystemZip(
 	if err != nil {
 		return 0, err
 	}
-	defer zr.Close()
+	defer func() { _ = zr.Close() }()
 
 	count := 0
 	for _, f := range zr.File {
@@ -197,10 +197,10 @@ func (c *Client) loadMALFromEcosystemZip(
 		}
 		var vuln Vulnerability
 		if err := json.NewDecoder(rc).Decode(&vuln); err != nil {
-			rc.Close()
+			_ = rc.Close()
 			continue
 		}
-		rc.Close()
+		_ = rc.Close()
 		if vuln.Withdrawn != "" {
 			continue
 		}
@@ -239,7 +239,7 @@ func (c *Client) ensureEcosystemZip(ctx context.Context, ecosystem string, onSta
 	if err != nil {
 		return "", nil, err
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 	if resp.StatusCode != http.StatusOK {
 		return "", nil, fmt.Errorf("gcs zip %s: status %d", ecosystem, resp.StatusCode)
 	}
@@ -274,16 +274,16 @@ func (c *Client) ensureEcosystemZip(ctx context.Context, ecosystem string, onSta
 		}
 		counter := &countWriter{w: dest, onWrite: reportDownload}
 		if _, err := io.Copy(counter, resp.Body); err != nil {
-			dest.Close()
-			os.Remove(tmpPath)
+			_ = dest.Close()
+			_ = os.Remove(tmpPath)
 			return "", nil, err
 		}
 		if err := dest.Close(); err != nil {
-			os.Remove(tmpPath)
+			_ = os.Remove(tmpPath)
 			return "", nil, err
 		}
 		if err := os.Rename(tmpPath, path); err != nil {
-			os.Remove(tmpPath)
+			_ = os.Remove(tmpPath)
 			return "", nil, err
 		}
 		return path, nil, nil
@@ -296,15 +296,15 @@ func (c *Client) ensureEcosystemZip(ctx context.Context, ecosystem string, onSta
 	path := tmp.Name()
 	counter := &countWriter{w: tmp, onWrite: reportDownload}
 	if _, err := io.Copy(counter, resp.Body); err != nil {
-		tmp.Close()
-		os.Remove(path)
+		_ = tmp.Close()
+		_ = os.Remove(path)
 		return "", nil, err
 	}
 	if err := tmp.Close(); err != nil {
-		os.Remove(path)
+		_ = os.Remove(path)
 		return "", nil, err
 	}
-	return path, func() { os.Remove(path) }, nil
+	return path, func() { _ = os.Remove(path) }, nil
 }
 
 type countWriter struct {

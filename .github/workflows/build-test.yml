@@ -36,10 +36,8 @@ jobs:
     steps:
       - uses: actions/checkout@v6
       - uses: projectdiscovery/actions/setup/go@v1
-      - name: Install govulncheck
-        run: go install golang.org/x/vuln/cmd/govulncheck@latest
       - name: Scan for vulnerabilities
-        run: govulncheck ./...
+        run: bash scripts/vulncheck.sh
 
   build:
     name: Test Builds

@@ -3,7 +3,6 @@ package cli
 import (
 	"fmt"
 	"io"
-	"os"
 	"path/filepath"
 	"strings"
 
@@ -17,12 +16,13 @@ import (
 )
 
 var (
-	flagRequireClean bool
-	flagSBOMExport   string
-	flagSBOMFormat   string
-	flagOutput       string
-	flagSARIFExport  string
-	flagExcludePkg   string
+	flagRequireClean  bool
+	flagSBOMExport    string
+	flagSBOMFormat    string
+	flagOutput        string
+	flagOutputFormats string
+	flagSARIFExport   string
+	flagExcludePkg    string
 )
 
 // addExcludePkgFlag registers the --exclude-pkg flag shared by audit and
@@ -42,10 +42,11 @@ func loadExcludeSet() (audit.ExcludeSet, error) {
 }
 
 // addAuditOutputFlags registers the result-output flags shared by the audit and
-// github commands. Each flag is independent: --output redirects the JSON result
-// file, --sarif-export additionally writes a SARIF report.
+// github commands. --output-format controls file exports (json, csv, txt);
+// --output sets the base path; --sarif-export additionally writes a SARIF report.
 func addAuditOutputFlags(cmd *cobra.Command) {
-	cmd.Flags().StringVarP(&flagOutput, "output", "o", "", "Write the JSON result to this path (default: a temp file)")
+	cmd.Flags().StringVarP(&flagOutput, "output", "o", "", "Write export file(s) to this path or basename (default: temp files in text mode)")
+	cmd.Flags().StringVar(&flagOutputFormats, "output-format", "", "Comma-separated export formats: json, csv, txt (default: json)")
 	cmd.Flags().StringVar(&flagSARIFExport, "sarif-export", "", "Write a SARIF 2.1.0 report of findings to this path")
 }
 
@@ -98,10 +99,15 @@ func runAudit(cmd *cobra.Command, paths []string, ghClient *github.Client, displ
 	return auditExitPolicy(result)
 }
 
-// emitAuditOutputs always writes a JSON result file (to --output, else a temp
-// file in text mode) and, when requested, a SARIF report. Path notices print to
-// stdout in text mode and to stderr in --json mode so stdout stays valid JSON.
+// emitAuditOutputs writes export files for each requested --output-format and,
+// when requested, a SARIF report. Path notices print to stdout in text mode and
+// to stderr in --json mode so stdout stays valid JSON.
 func emitAuditOutputs(result *audit.Result) error {
+	formats, err := output.ParseExportFormats(flagOutputFormats)
+	if err != nil {
+		return apperr.Usage(err.Error())
+	}
+
 	o := outOpts()
 	noticeOut := o.Writer
 	if flagJSON {
@@ -109,20 +115,20 @@ func emitAuditOutputs(result *audit.Result) error {
 	}
 	c := o.Color()
 
-	jsonPath := strings.TrimSpace(flagOutput)
-	if jsonPath == "" && !flagJSON {
-		f, err := os.CreateTemp("", "depx-audit-*.json")
-		if err != nil {
-			return apperr.Upstream("create temp result file", err)
+	outputPath := strings.TrimSpace(flagOutput)
+	writeExports := outputPath != "" || !flagJSON
+	if writeExports {
+		for _, format := range formats {
+			path, err := output.ResolveExportPath(outputPath, format, formats)
+			if err != nil {
+				return apperr.Upstream("create export file", err)
+			}
+			written, err := output.WriteAuditExport(path, format, Version, "audit", result)
+			if err != nil {
+				return apperr.Upstream("write "+string(format)+" export", err)
+			}
+			printOutputNotice(noticeOut, c, format.ExportNoticeLabel(), written)
 		}
-		jsonPath = f.Name()
-		_ = f.Close()
-	}
-	if jsonPath != "" {
-		if _, err := output.WriteResultFile(jsonPath, Version, "audit", result); err != nil {
-			return apperr.Upstream("write json result", err)
-		}
-		printOutputNotice(noticeOut, c, "JSON result", jsonPath)
 	}
 
 	if sarifPath := strings.TrimSpace(flagSARIFExport); sarifPath != "" {

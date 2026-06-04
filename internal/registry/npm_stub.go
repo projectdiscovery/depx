@@ -39,7 +39,7 @@ func (c *Client) fetchNPMSecurityHolding(ctx context.Context, name string) (bool
 	if err != nil {
 		return false, err
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	if resp.StatusCode == http.StatusNotFound {
 		return false, nil

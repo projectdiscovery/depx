@@ -16,7 +16,7 @@ This file captures conventions for AI agents and contributors working on [depx](
 | `depx search <query>` | Search malicious packages by name |
 | `depx github [target...]` | **GitHub-only** repo/org scanning |
 | `depx id <MAL\|GHSA\|...>` | Advisory lookup |
-| `depx version` / `depx update` | Version info and self-update |
+| `depx version` / `depx --version` / `depx update` | Version info and self-update |
 
 **Do not** add GitHub repo auditing to `depx audit`. GitHub targets belong exclusively on `depx github`. If audit receives a `github:` ref without a configured client, return a clear error pointing users to `depx github`.
 
@@ -108,8 +108,9 @@ Break/adversarial tests belong in `e2e/break_test.go` and `e2e/break_github_test
 2. **No shell completion subcommand** — Cobra default completion is disabled.
 3. **No `depx check` subcommand** — checks are `depx <ref>` or stdin; `depx check <ref>` is an optional alias (keyword stripped at root).
 4. **Errors** — use `internal/apperr` (`Usage`, `Upstream`); wrapped causes must appear in `Error()`.
-5. **Tests** — run `go test ./...` before finishing; add unit tests for non-trivial parsing/API logic.
-6. **README** — update command tables when user-facing behavior changes.
+5. **CI gate before commit** — run `make ci` and ensure it passes before considering work ready to commit or hand off. Do not skip this for “small” changes. If `make ci` fails, fix the failure or call out the blocker explicitly; do not treat the task as done.
+6. **Tests** — add unit/e2e tests for non-trivial parsing, API, or CLI behavior; `make ci` already runs `go test ./... -count=1` and race tests.
+7. **README** — update command tables when user-facing behavior changes.
 
 ## Environment variables
 
@@ -138,6 +139,15 @@ Workflows match other ProjectDiscovery Go CLIs (`subfinder`, `httpx`):
 | `release-test.yml` | PR | GoReleaser snapshot build |
 | `release-binary.yml` | `v*` tag push | GoReleaser release (binaries) |
 | `dep-auto-merge.yml` | Dependabot PRs | Auto-merge dependency updates |
+
+**Local CI gate:** run `make ci` before commit. It mirrors `build-test.yml` on one machine:
+
+```bash
+make ci
+# fmt-check → lint → vulncheck → build → test → race → race-build
+```
+
+`make lint` downloads the official golangci-lint binary (Go 1.25–compatible). Do not use a Homebrew/`go install` linter built with Go 1.24 against this repo.
 
 Release optional secrets: `RELEASE_SLACK_WEBHOOK`, `DISCORD_WEBHOOK_*`, `DEPENDABOT_PAT`.
 

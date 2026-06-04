@@ -37,15 +37,15 @@ func TestParseMALZip(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer zr.Close()
+	defer func() { _ = zr.Close() }()
 	for _, f := range zr.File {
 		rc, _ := f.Open()
 		var vuln Vulnerability
 		if err := json.NewDecoder(rc).Decode(&vuln); err != nil {
-			rc.Close()
+			_ = rc.Close()
 			t.Fatal(err)
 		}
-		rc.Close()
+		_ = rc.Close()
 		mu.Lock()
 		idx.addVuln(&vuln)
 		mu.Unlock()

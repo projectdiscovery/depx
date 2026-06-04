@@ -230,7 +230,7 @@ func (c *Client) doRequestOnce(ctx context.Context, method, endpoint string, bod
 	if err != nil {
 		return nil, 0, nil, err
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 	raw, err := io.ReadAll(io.LimitReader(resp.Body, 32<<20))
 	if err != nil {
 		return nil, resp.StatusCode, resp.Header, err

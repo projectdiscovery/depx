@@ -6,7 +6,6 @@ import (
 	"io"
 	"os"
 	"path/filepath"
-	"time"
 
 	"github.com/logrusorgru/aurora"
 
@@ -182,13 +181,6 @@ func RenderSearch(o Options, version string, result *search.Result) error {
 	}
 	writeCardFooter(o.Writer, c, len(result.Packages), result.Total, suffix)
 	return nil
-}
-
-func formatFeedTime(t time.Time) string {
-	if t.IsZero() {
-		return "-"
-	}
-	return t.UTC().Format(time.RFC3339)
 }
 
 func verdictLabel(c aurora.Aurora, verdict string) string {

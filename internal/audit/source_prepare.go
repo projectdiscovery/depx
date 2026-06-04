@@ -26,7 +26,7 @@ func symlinkWithSuffix(src, suffix string) (string, func(), error) {
 	if err != nil {
 		return "", nil, err
 	}
-	cleanup := func() { os.RemoveAll(dir) }
+	cleanup := func() { _ = os.RemoveAll(dir) }
 	link := filepath.Join(dir, "sbom"+suffix)
 	if err := os.Symlink(src, link); err != nil {
 		cleanup()

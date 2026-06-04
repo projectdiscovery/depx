@@ -57,10 +57,3 @@ func pluginsForSource(sourceType SourceType) []string {
 	}
 	return lockfilePlugins
 }
-
-func sourceKindLabel(sourceType SourceType) string {
-	if sourceType == SourceTypeSBOM {
-		return "SBOM"
-	}
-	return "lockfile"
-}

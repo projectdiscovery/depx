@@ -25,6 +25,7 @@ var (
 	flagEcosystem     string
 	flagDisableUpdate bool
 	flagUpdate        bool
+	flagVersion       bool
 	flagSince         string
 	flagLimit         int
 	flagRaw           bool
@@ -37,6 +38,7 @@ func Execute() error {
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()
 	root := NewRootCmd()
+	root.SetArgs(normalizePDStyleArgs(os.Args[1:]))
 	root.SetContext(ctx)
 	return root.ExecuteContext(ctx)
 }
@@ -53,6 +55,10 @@ func NewRootCmd() *cobra.Command {
 		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
 			if flagUpdate {
 				runUpdate()
+				os.Exit(0)
+			}
+			if flagVersion {
+				showVersion()
 				os.Exit(0)
 			}
 			if !flagSilent {
@@ -96,6 +102,7 @@ func NewRootCmd() *cobra.Command {
 	root.PersistentFlags().StringVar(&cfgPath, "config", "", "Config file path")
 	root.PersistentFlags().BoolVar(&flagDisableUpdate, "disable-update-check", false, "Disable update check")
 	root.PersistentFlags().BoolVar(&flagUpdate, "update", false, "Update depx to latest version")
+	root.PersistentFlags().BoolVarP(&flagVersion, "version", "V", false, "Show version and exit")
 
 	root.Flags().StringVar(&flagSince, "since", "3d", "Include advisories published within this window")
 	root.Flags().IntVarP(&flagLimit, "limit", "n", 0, fmt.Sprintf("Feed result limit on default command (max %d; use depx github -n for repo caps)", config.MaxFeedLimit))

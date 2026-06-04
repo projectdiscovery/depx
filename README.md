@@ -96,6 +96,7 @@ Available Commands:
 
 Global flags:
   -j, --json                   Machine-readable JSON output
+  -V, --version                Show version and exit
   -e, --ecosystem string       Restrict lookup to one ecosystem (npm, PyPI, Go, ...)
   -v, --verbose                Extra audit/github detail
       --silent                 Suppress banner and version info
@@ -120,7 +121,8 @@ depx search:
 depx audit / depx github:
       --require-clean          Exit 1 if any malicious package is found
       --exclude-pkg string     File of ecosystem:package lines to exclude from findings
-  -o, --output string          Write JSON result to this path
+  -o, --output string          Write export file(s) to this path or basename
+      --output-format string   Comma-separated export formats: json, csv, txt (default: json)
       --sarif-export string    Write SARIF 2.1.0 report to this path
       --sbom-export string     Write audited dependency SBOM (audit only)
       --sbom-format string     SBOM format: cyclonedx (default) or spdx

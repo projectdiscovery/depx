@@ -124,7 +124,7 @@ func SaveManifest(cacheDir string, m *Manifest) error {
 	}
 	tmpName := tmp.Name()
 	if _, err := tmp.Write(payload); err != nil {
-		tmp.Close()
+		_ = tmp.Close()
 		_ = os.Remove(tmpName)
 		return err
 	}

@@ -91,7 +91,7 @@ func TestE2EAuditOutputOptions(t *testing.T) {
 			t.Fatalf("expected JSON result notice, got:\n%s", out)
 		}
 		path := extractNoticePath(t, out, "JSON result:")
-		defer os.Remove(path)
+		defer func() { _ = os.Remove(path) }()
 		assertResultFile(t, path, "audit")
 	})
 
@@ -181,6 +181,75 @@ func TestE2EAuditOutputOptions(t *testing.T) {
 		assertJSONCommand(t, out, "audit")
 		if strings.Contains(out, "JSON result:") {
 			t.Fatalf("path notice leaked into --json stdout:\n%s", out)
+		}
+	})
+
+	// --output-format csv writes a flat findings table.
+	t.Run("output format csv", func(t *testing.T) {
+		dest := filepath.Join(t.TempDir(), "result.csv")
+		out, code := r.run("audit", malLockfile, "--output-format", "csv", "-o", dest)
+		if code != 0 {
+			t.Fatalf("exit %d: %s", code, out)
+		}
+		if !strings.Contains(out, "CSV result:") {
+			t.Fatalf("expected CSV notice, got:\n%s", out)
+		}
+		if strings.Contains(out, "JSON result:") {
+			t.Fatalf("csv-only export should not write json:\n%s", out)
+		}
+		raw, err := os.ReadFile(dest)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if !strings.Contains(string(raw), "verdict,ecosystem") {
+			t.Fatalf("unexpected csv header: %s", raw)
+		}
+		if !strings.Contains(string(raw), "malicious") {
+			t.Fatalf("expected malicious finding row in csv: %s", raw)
+		}
+	})
+
+	// Clean audits still produce a useful CSV summary row.
+	t.Run("output format csv clean audit", func(t *testing.T) {
+		dest := filepath.Join(t.TempDir(), "clean.csv")
+		out, code := r.run("audit", cleanProject, "--output-format", "csv", "-o", dest)
+		if code != 0 {
+			t.Fatalf("exit %d: %s", code, out)
+		}
+		raw, err := os.ReadFile(dest)
+		if err != nil {
+			t.Fatal(err)
+		}
+		body := string(raw)
+		if !strings.Contains(body, "clean") {
+			t.Fatalf("expected clean summary row in csv: %s", body)
+		}
+		if !strings.Contains(body, "dependencies checked") {
+			t.Fatalf("expected dependency stats in csv summary: %s", body)
+		}
+	})
+
+	// Multiple formats write separate files from one basename.
+	t.Run("multiple output formats", func(t *testing.T) {
+		base := filepath.Join(t.TempDir(), "multi")
+		out, code := r.run("audit", cleanProject, "--output-format", "json,csv,txt", "-o", base)
+		if code != 0 {
+			t.Fatalf("exit %d: %s", code, out)
+		}
+		for _, label := range []string{"JSON result:", "CSV result:", "Text result:"} {
+			if !strings.Contains(out, label) {
+				t.Fatalf("missing %s in output:\n%s", label, out)
+			}
+		}
+		jsonPath := base + ".json"
+		csvPath := base + ".csv"
+		txtPath := base + ".txt"
+		assertResultFile(t, jsonPath, "audit")
+		if raw, err := os.ReadFile(csvPath); err != nil || !strings.Contains(string(raw), "verdict") {
+			t.Fatalf("csv file missing or invalid: err=%v raw=%q", err, raw)
+		}
+		if raw, err := os.ReadFile(txtPath); err != nil || !strings.Contains(string(raw), "Audit results") {
+			t.Fatalf("txt file missing or invalid: err=%v raw=%q", err, raw)
 		}
 	})
 

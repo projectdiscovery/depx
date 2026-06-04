@@ -109,7 +109,7 @@ func (t Target) Repo() (Repo, bool) {
 	if t.IsOrg() {
 		return Repo{}, false
 	}
-	return Repo{Owner: t.Owner, Name: t.Name}, true
+	return Repo(t), true
 }
 
 // ParseTarget parses github subcommand inputs:
@@ -141,7 +141,7 @@ func ParseTarget(input string) (Target, error) {
 		return target, nil
 	}
 	if repo, ok := parseOwnerRepo(input); ok {
-		return Target{Owner: repo.Owner, Name: repo.Name}, nil
+		return Target(repo), nil
 	}
 	if owner, ok := parseOwnerOnly(input); ok {
 		return Target{Owner: owner}, nil
@@ -172,7 +172,7 @@ func parsePathTarget(path string) (Target, bool) {
 		return Target{}, false
 	}
 	if repo, ok := parseOwnerRepo(path); ok {
-		return Target{Owner: repo.Owner, Name: repo.Name}, true
+		return Target(repo), true
 	}
 	parts := strings.Split(path, "/")
 	if len(parts) != 1 {

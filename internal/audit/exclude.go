@@ -47,7 +47,7 @@ func LoadExcludeFile(path string) (ExcludeSet, error) {
 	if err != nil {
 		return ExcludeSet{}, fmt.Errorf("open exclude file: %w", err)
 	}
-	defer f.Close()
+	defer func() { _ = f.Close() }()
 
 	set := ExcludeSet{
 		exact: map[string]struct{}{},

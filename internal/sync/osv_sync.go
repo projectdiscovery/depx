@@ -36,10 +36,6 @@ func (s *osvSyncer) compiledPath() string {
 	return osv.CompiledCachePath(s.cfg.CacheDir, "compiled")
 }
 
-func (s *osvSyncer) blobPath(id string) string {
-	return filepath.Join(s.cfg.CacheDir, osvBlobRel, id+".json")
-}
-
 func (s *osvSyncer) loadIndex(ctx context.Context, foreground bool, onProgress osv.IndexLoadProgress, onStatus osv.IndexLoadStatus) (*osv.MaliciousIndex, error) {
 	manifest, err := loadManifest(s.cfg.CacheDir, "osv")
 	if err != nil {
@@ -270,7 +266,7 @@ func (s *osvSyncer) fetchCatalog(ctx context.Context) ([]osv.IndexEntry, string,
 	if err != nil {
 		return nil, "", err
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 	if resp.StatusCode != http.StatusOK {
 		return nil, "", fmt.Errorf("modified index: status %d", resp.StatusCode)
 	}
@@ -472,7 +468,7 @@ func (s *osvSyncer) fetchVulnHTTP(ctx context.Context, url string) (*osv.Vulnera
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 	if resp.StatusCode != http.StatusOK {
 		return nil, fmt.Errorf("vuln fetch %s: status %d", url, resp.StatusCode)
 	}

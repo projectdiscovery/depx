@@ -165,10 +165,6 @@ func (p *osvProvider) scheduleFeedIndexRefresh() {
 	}()
 }
 
-func (p *osvProvider) userAgent() string {
-	return fmt.Sprintf("depx/%s (+https://github.com/projectdiscovery/depx)", p.version)
-}
-
 func (p *osvProvider) clientUserAgent() string {
 	return "depx (+https://github.com/projectdiscovery/depx)"
 }

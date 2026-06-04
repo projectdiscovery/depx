@@ -187,7 +187,7 @@ func (c *Client) fetchVuln(ctx context.Context, id string) (*Vulnerability, erro
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	if resp.StatusCode == http.StatusNotFound {
 		return nil, fmt.Errorf("vulnerability %q not found", id)
@@ -233,7 +233,7 @@ func (c *Client) fetchQuery(ctx context.Context, q QueryRequest) (*QueryResponse
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	if resp.StatusCode != http.StatusOK {
 		raw, _ := io.ReadAll(io.LimitReader(resp.Body, 4096))
@@ -292,7 +292,7 @@ func (c *Client) fetchQueryBatch(ctx context.Context, queries []QueryRequest) (*
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	if resp.StatusCode != http.StatusOK {
 		raw, _ := io.ReadAll(io.LimitReader(resp.Body, 4096))
@@ -321,7 +321,7 @@ func StreamModifiedIndex(ctx context.Context, url string, userAgent string, time
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	if resp.StatusCode != http.StatusOK {
 		return nil, fmt.Errorf("modified index: status %d", resp.StatusCode)
