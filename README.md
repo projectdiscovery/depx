@@ -1,6 +1,4 @@
-<p align="center">
-  <img src="docs/assets/depx-logo.png" alt="depx" width="150px">
-</p>
+  <h1 align="center">depx</h1>
 
 <h4 align="center">Malicious package &amp; supply-chain intelligence</h4>
 
