@@ -1,0 +1,24 @@
+name: 🔨 Release Test
+
+on:
+  pull_request:
+    paths:
+      - '**.go'
+      - '**.mod'
+      - '.goreleaser.yml'
+      - 'scripts/**'
+  workflow_dispatch:
+
+jobs:
+  release-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - uses: projectdiscovery/actions/setup/go@v1
+
+      - name: Release test
+        uses: projectdiscovery/actions/goreleaser@v1

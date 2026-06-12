@@ -1,0 +1,24 @@
+# Binaries
+/bin/
+/dist/
+/depx
+/cmd/depx/depx
+
+# Test & build output
+*.test
+*.out
+coverage.txt
+
+# Local cache
+/.cache/
+**/pd.json
+**/mal/compiled.json
+**/vulns/*.json
+**/feed/index.json
+
+# OS files
+.DS_Store
+
+# Force-track repo essentials (may be ignored by ~/.gitignore_global)
+!Makefile
+!LICENSE

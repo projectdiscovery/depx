@@ -1,0 +1,71 @@
+name: 🔨 Build Test
+
+on:
+  pull_request:
+    paths:
+      - '**.go'
+      - '**.mod'
+      - '.goreleaser.yml'
+      - 'scripts/**'
+  workflow_dispatch:
+
+jobs:
+  lint:
+    name: Lint Test
+    if: ${{ !endsWith(github.actor, '[bot]') }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: projectdiscovery/actions/setup/go@v1
+      - uses: projectdiscovery/actions/golangci-lint/v2@v1
+
+  fmt:
+    name: gofmt
+    if: ${{ !endsWith(github.actor, '[bot]') }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: projectdiscovery/actions/setup/go@v1
+      - name: Check formatting
+        run: test -z "$(gofmt -l .)"
+
+  vulncheck:
+    name: govulncheck
+    if: ${{ !endsWith(github.actor, '[bot]') }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: projectdiscovery/actions/setup/go@v1
+      - name: Scan for vulnerabilities
+        run: bash scripts/vulncheck.sh
+
+  build:
+    name: Test Builds
+    needs: [lint, fmt]
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macOS-latest]
+    steps:
+      - uses: actions/checkout@v6
+      - uses: projectdiscovery/actions/setup/go@v1
+
+      - name: Build
+        run: go build ./cmd/depx
+
+      - name: Test
+        run: go test ./... -count=1
+
+      - name: Race condition build
+        run: go build -race ./cmd/depx
+
+  race:
+    name: Race Test
+    needs: [lint, fmt]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: projectdiscovery/actions/setup/go@v1
+
+      - name: Test (race detector)
+        run: go test -race ./... -count=1

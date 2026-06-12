@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "depx feed response",
+  "type": "object",
+  "required": ["schema_version", "command", "depx_version", "data"],
+  "properties": {
+    "schema_version": { "const": "1" },
+    "command": { "const": "feed" },
+    "depx_version": { "type": "string" },
+    "data": {
+      "type": "object",
+      "required": ["since", "limit", "total", "packages"],
+      "properties": {
+        "since": { "type": "string" },
+        "ecosystem": { "type": "string" },
+        "limit": { "type": "integer" },
+        "total": { "type": "integer" },
+        "source": { "type": "string" },
+        "packages": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["ecosystem", "ids", "modified_at"],
+            "properties": {
+              "ecosystem": { "type": "string" },
+              "name": { "type": "string" },
+              "version": { "type": "string" },
+              "registry_url": { "type": "string" },
+              "ids": { "type": "array", "items": { "type": "string" } },
+              "aliases": { "type": "array", "items": { "type": "string" } },
+              "modified_at": { "type": "string", "format": "date-time" },
+              "published_at": { "type": "string", "format": "date-time" },
+              "imported_at": { "type": "string", "format": "date-time" },
+              "campaign": { "type": "string" }
+            }
+          }
+        }
+      }
+    }
+  }
+}

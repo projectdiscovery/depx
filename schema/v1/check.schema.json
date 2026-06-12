@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "depx check response",
+  "type": "object",
+  "required": ["schema_version", "command", "depx_version", "data"],
+  "properties": {
+    "schema_version": { "const": "1" },
+    "command": { "const": "check" },
+    "depx_version": { "type": "string" },
+    "data": {
+      "type": "object",
+      "required": ["total", "results"],
+      "properties": {
+        "total": { "type": "integer" },
+        "results": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["ref", "purl", "verdict", "confidence", "ids"],
+            "properties": {
+              "ref": { "type": "string" },
+              "purl": { "type": "string" },
+              "verdict": { "type": "string" },
+              "confidence": { "type": "string" },
+              "ids": { "type": "array", "items": { "type": "string" } }
+            }
+          }
+        }
+      }
+    }
+  }
+}

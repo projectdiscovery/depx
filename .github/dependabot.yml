@@ -1,0 +1,16 @@
+# https://docs.github.com/en/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file
+
+version: 2
+updates:
+  - package-ecosystem: gomod
+    directory: /
+    schedule:
+      interval: weekly
+    target-branch: main
+    commit-message:
+      prefix: chore
+      include: scope
+    labels:
+      - Type: Maintenance
+    allow:
+      - dependency-name: github.com/projectdiscovery/*

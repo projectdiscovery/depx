@@ -1,0 +1,17 @@
+version: "2"
+
+run:
+  timeout: 30m
+
+linters:
+  default: standard
+  enable:
+    - errcheck
+    - staticcheck
+    - unused
+  settings:
+    errcheck:
+      exclude-functions:
+        - fmt.Fprintf
+        - fmt.Fprintln
+        - (io.Writer).Write

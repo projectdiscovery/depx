@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "depx search response",
+  "type": "object",
+  "required": ["schema_version", "command", "depx_version", "data"],
+  "properties": {
+    "schema_version": { "const": "1" },
+    "command": { "const": "search" },
+    "depx_version": { "type": "string" },
+    "data": {
+      "type": "object",
+      "required": ["query", "limit", "total", "shown", "packages"],
+      "properties": {
+        "query": { "type": "string" },
+        "ecosystem": { "type": "string" },
+        "limit": { "type": "integer" },
+        "total": { "type": "integer" },
+        "shown": { "type": "integer" },
+        "source": { "type": "string" },
+        "packages": { "type": "array" }
+      }
+    }
+  }
+}
