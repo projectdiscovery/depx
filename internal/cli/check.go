@@ -34,6 +34,18 @@ func runChecks(cmd *cobra.Command, args []string) error {
 		return runIDLookups(cmd, advisoryIDs)
 	}
 
+	if intelProvider != nil {
+		st := intelProvider.SyncStatus()
+		if st.LastSuccess.IsZero() {
+			if _, err := withSpinner("Downloading malicious package index…", func() (struct{}, error) {
+				intelProvider.WaitBackgroundSync()
+				return struct{}{}, nil
+			}); err != nil {
+				return err
+			}
+		}
+	}
+
 	svc := check.NewService(intelProvider, registry.NewClient(userAgent(), appCfg.Timeout), appCfg.CacheDir)
 
 	results := make([]check.Result, len(pkgRefs))
