@@ -7,6 +7,8 @@ import (
 	"path/filepath"
 	"strings"
 	"testing"
+
+	"github.com/projectdiscovery/depx/internal/cli"
 )
 
 func TestCLI(t *testing.T) {
@@ -246,7 +248,7 @@ func TestCLI(t *testing.T) {
 		if err != nil {
 			t.Fatalf("version failed: %v\n%s", err, out)
 		}
-		if !strings.Contains(string(out), "v0.1.0") {
+		if !strings.Contains(string(out), cli.Version) {
 			t.Fatalf("missing version: %s", out)
 		}
 	})
