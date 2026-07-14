@@ -7,7 +7,7 @@ import (
 
 func TestCompiledMALCacheValid(t *testing.T) {
 	now := time.Now().UTC()
-	fresh := compiledMALCache{BuiltAt: now, EntryCount: 226705}
+	fresh := compiledMALCache{SchemaVersion: compiledSchemaVersion, BuiltAt: now, EntryCount: 226705}
 
 	if !compiledMALCacheValid(fresh, 226705) {
 		t.Fatal("exact count should be valid")
@@ -25,8 +25,13 @@ func TestCompiledMALCacheValid(t *testing.T) {
 		t.Fatal("shrunk index should be invalid")
 	}
 
-	stale := compiledMALCache{BuiltAt: now.Add(-8 * 24 * time.Hour), EntryCount: 226705}
+	stale := compiledMALCache{SchemaVersion: compiledSchemaVersion, BuiltAt: now.Add(-8 * 24 * time.Hour), EntryCount: 226705}
 	if compiledMALCacheValid(stale, 226705) {
 		t.Fatal("expired cache should be invalid")
+	}
+
+	wrongSchema := compiledMALCache{SchemaVersion: compiledSchemaVersion - 1, BuiltAt: now, EntryCount: 226705}
+	if compiledMALCacheValid(wrongSchema, 226705) {
+		t.Fatal("wrong schema version should be invalid")
 	}
 }

@@ -138,6 +138,35 @@ func TestAddListingCarriesTimestamps(t *testing.T) {
 	}
 }
 
+// npm names are case-sensitive: malicious "Orchestrator" must not match legit "orchestrator".
+func TestNPMCaseSensitiveMatching(t *testing.T) {
+	idx := &MaliciousIndex{}
+	addListing(idx, "npm", "Orchestrator", "MAL-2025-28475", "Malicious code in Orchestrator (npm)", true, nil, time.Time{}, time.Time{})
+
+	if got := idx.Match("npm", "orchestrator", "0.3.8"); len(got) != 0 {
+		t.Fatalf("lowercase orchestrator must not match malicious Orchestrator advisory, got %+v", got)
+	}
+	if got := idx.Match("npm", "Orchestrator", "1.0.0"); len(got) != 1 || got[0].ID != "MAL-2025-28475" {
+		t.Fatalf("capital-O Orchestrator must match its advisory, got %+v", got)
+	}
+	if _, ok := idx.LookupByID("MAL-2025-28475"); !ok {
+		t.Fatal("advisory must remain discoverable by ID")
+	}
+}
+
+// PyPI names are case-insensitive (PEP 503): both casings hit the same advisory.
+func TestPyPICaseInsensitiveMatching(t *testing.T) {
+	idx := &MaliciousIndex{}
+	addListing(idx, "PyPI", "requests", "MAL-PYPI-1", "bad requests", true, nil, time.Time{}, time.Time{})
+
+	if got := idx.Match("PyPI", "Requests", "2.28.0"); len(got) != 1 {
+		t.Fatalf("PyPI match must be case-insensitive (Requests), got %+v", got)
+	}
+	if got := idx.Match("PyPI", "requests", "2.28.0"); len(got) != 1 {
+		t.Fatalf("PyPI match must be case-insensitive (requests), got %+v", got)
+	}
+}
+
 // TestAddRecordNoVersionCoverage guards the fsevents-style false positive: the
 // export drops upstream OSV ranges, so a ranged advisory arrives as
 // all_versions=false with an empty affected_versions list. Such a record must

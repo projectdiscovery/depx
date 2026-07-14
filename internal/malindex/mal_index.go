@@ -43,12 +43,15 @@ type IndexLoadStatus func(msg string)
 const (
 	malCompiledCacheTTL   = 7 * 24 * time.Hour
 	malCompiledCountDrift = 1000
+	// compiledSchemaVersion invalidates on-disk caches when the key format changes.
+	compiledSchemaVersion = 2
 )
 
 type compiledMALCache struct {
-	BuiltAt    time.Time                    `json:"built_at"`
-	EntryCount int                          `json:"entry_count"`
-	Packages   map[string][]compiledMALVuln `json:"packages"`
+	SchemaVersion int                          `json:"schema_version,omitempty"`
+	BuiltAt       time.Time                    `json:"built_at"`
+	EntryCount    int                          `json:"entry_count"`
+	Packages      map[string][]compiledMALVuln `json:"packages"`
 }
 
 type compiledMALVuln struct {
@@ -149,6 +152,9 @@ func SaveCompiledIndex(path string, entryCount int, idx *MaliciousIndex) error {
 }
 
 func compiledMALCacheValid(cached compiledMALCache, entryCount int) bool {
+	if cached.SchemaVersion != compiledSchemaVersion {
+		return false
+	}
 	if malCompiledCacheTTL > 0 && time.Since(cached.BuiltAt) > malCompiledCacheTTL {
 		return false
 	}
@@ -191,9 +197,10 @@ func saveCompiledMALIndex(path string, entryCount int, idx *MaliciousIndex) erro
 		return nil
 	}
 	out := compiledMALCache{
-		BuiltAt:    time.Now().UTC(),
-		EntryCount: entryCount,
-		Packages:   make(map[string][]compiledMALVuln, len(idx.byPackage)),
+		SchemaVersion: compiledSchemaVersion,
+		BuiltAt:       time.Now().UTC(),
+		EntryCount:    entryCount,
+		Packages:      make(map[string][]compiledMALVuln, len(idx.byPackage)),
 	}
 	for key, items := range idx.byPackage {
 		compiled := make([]compiledMALVuln, 0, len(items))
@@ -357,7 +364,14 @@ func (idx *MaliciousIndex) registerID(key string, pv malPackageVuln) {
 }
 
 func packageKey(ecosystem, name string) string {
-	return NormalizeEcosystem(ecosystem) + "|" + strings.ToLower(name)
+	eco := NormalizeEcosystem(ecosystem)
+	// PyPI/RubyGems are case-insensitive; others preserve casing so malicious
+	// npm "Orchestrator" never matches the legitimate "orchestrator".
+	switch eco {
+	case "PyPI", "RubyGems":
+		name = strings.ToLower(name)
+	}
+	return eco + "|" + name
 }
 
 // NormalizeEcosystem maps CLI/config aliases to canonical OSV ecosystem names.
