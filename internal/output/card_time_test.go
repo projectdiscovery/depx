@@ -87,8 +87,8 @@ func TestWriteFeedCardUsesAgeLabelAndRelativeTimestamps(t *testing.T) {
 	if strings.Contains(out, "Withdrawn:") {
 		t.Fatalf("withdrawn line should be omitted from card:\n%s", out)
 	}
-	if !strings.Contains(out, "OSV:") {
-		t.Fatalf("expected OSV on last detail line:\n%s", out)
+	if !strings.Contains(out, "Source:") {
+		t.Fatalf("expected Source on last detail line:\n%s", out)
 	}
 	if strings.Contains(out, "Campaign:") {
 		t.Fatalf("campaign removed from feed card:\n%s", out)

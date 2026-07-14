@@ -32,6 +32,17 @@ type DatabaseSpecific struct {
 	MaliciousPackagesOrigins []MaliciousOrigin `json:"malicious-packages-origins"`
 }
 
+// SourceName returns the advisory's origin feed (e.g. "ossf", "x-osint",
+// "shai-hulud") from database_specific, or "" if unknown.
+func (v *Vulnerability) SourceName() string {
+	for _, origin := range v.DatabaseSpecific.MaliciousPackagesOrigins {
+		if origin.Source != "" {
+			return origin.Source
+		}
+	}
+	return ""
+}
+
 func (v *Vulnerability) PublishedTime() time.Time {
 	t, _ := parseOSVTime(v.Published)
 	return t
@@ -71,8 +82,17 @@ func (v *Vulnerability) PackageEcosystem() string {
 
 const defaultVulnPageBase = "https://osv.dev/vulnerability"
 
-// VulnPageURL returns the public OSV advisory page for an ID.
+// HasOSVDevPage reports whether id links to osv.dev. Only MAL-* for now; other
+// ids (incl. GHSCAN-MAL-* synthetics) show their source name instead.
+func HasOSVDevPage(id string) bool {
+	return strings.HasPrefix(strings.ToUpper(strings.TrimSpace(id)), "MAL-")
+}
+
+// VulnPageURL returns the osv.dev page for an id, or "" if not hosted there.
 func VulnPageURL(id string) string {
+	if !HasOSVDevPage(id) {
+		return ""
+	}
 	if base := os.Getenv("DEPX_OSV_VULN_URL"); base != "" {
 		return strings.TrimRight(base, "/") + "/" + id
 	}

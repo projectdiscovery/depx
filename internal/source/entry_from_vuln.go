@@ -22,6 +22,7 @@ func EnrichFromVuln(entry *PackageEntry, vuln *malindex.Vulnerability) {
 	}
 	entry.Summary = vuln.Summary
 	entry.Aliases = append([]string(nil), vuln.Aliases...)
+	entry.Source = vuln.SourceName()
 	entry.Withdrawn = vuln.Withdrawn != ""
 	if pub := vuln.PublishedTime(); !pub.IsZero() {
 		entry.Published = pub

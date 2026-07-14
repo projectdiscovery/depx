@@ -21,6 +21,7 @@ type feedSnapshotHit struct {
 	Name      string    `json:"name"`
 	IDs       []string  `json:"ids"`
 	Summary   string    `json:"summary,omitempty"`
+	Source    string    `json:"source,omitempty"`
 	Published time.Time `json:"published"`
 	Modified  time.Time `json:"modified"`
 }
@@ -48,6 +49,7 @@ func WritePublishedFeedSnapshot(cacheDir, compiledPath string, idx *MaliciousInd
 			Name:      h.Name,
 			IDs:       append([]string(nil), h.IDs...),
 			Summary:   h.Summary,
+			Source:    h.Source,
 			Published: h.Published,
 			Modified:  h.Modified,
 		})
@@ -98,6 +100,7 @@ func LoadPublishedFeedSnapshot(cacheDir, compiledPath string) ([]SearchHit, bool
 			Name:      h.Name,
 			IDs:       append([]string(nil), h.IDs...),
 			Summary:   h.Summary,
+			Source:    h.Source,
 			Published: h.Published,
 			Modified:  h.Modified,
 		})

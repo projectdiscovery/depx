@@ -227,14 +227,7 @@ func writeFeedCard(o Options, pkg source.PackageEntry) {
 		writePackageURLLine(o, c, pkg.PackageURL, pkg.Version)
 	}
 
-	fmt.Fprintf(o.Writer, "  %s OSV: %s",
-		c.Cyan("↳"),
-		c.BrightBlue(malindex.VulnPageURL(id)),
-	)
-	if aliases := truncateList(pkg.Aliases, 2); aliases != "" {
-		fmt.Fprintf(o.Writer, " | Aliases: %s", c.BrightWhite(aliases))
-	}
-	fmt.Fprintln(o.Writer)
+	writeAdvisoryLinkLine(o, c, id, pkg.Aliases, pkg.Source)
 }
 
 func writeAuditFindingCard(o Options, f audit.Finding) {
@@ -278,10 +271,30 @@ func writeAuditFindingCard(o Options, f audit.Finding) {
 		writePackageURLLine(o, c, f.PackageURL, f.Version)
 	}
 
-	fmt.Fprintf(o.Writer, "  %s OSV: %s\n",
-		c.Cyan("↳"),
-		c.BrightBlue(malindex.VulnPageURL(id)),
-	)
+	writeAdvisoryLinkLine(o, c, id, nil, "")
+}
+
+// writeAdvisoryLinkLine prints the "Source" line: MAL-* ids link to osv.dev,
+// other ids show their origin feed name. Aliases appended when present.
+func writeAdvisoryLinkLine(o Options, c aurora.Aurora, id string, aliases []string, source string) {
+	url := malindex.VulnPageURL(id)
+	aliasText := truncateList(aliases, 2)
+	var value interface{}
+	switch {
+	case url != "":
+		value = c.BrightBlue(url)
+	case source != "":
+		value = c.BrightWhite(source)
+	}
+	switch {
+	case value != nil && aliasText != "":
+		fmt.Fprintf(o.Writer, "  %s Source: %s | Aliases: %s\n",
+			c.Cyan("↳"), value, c.BrightWhite(aliasText))
+	case value != nil:
+		fmt.Fprintf(o.Writer, "  %s Source: %s\n", c.Cyan("↳"), value)
+	case aliasText != "":
+		fmt.Fprintf(o.Writer, "  %s Aliases: %s\n", c.Cyan("↳"), c.BrightWhite(aliasText))
+	}
 }
 
 func formatFindingDependency(f audit.Finding) string {

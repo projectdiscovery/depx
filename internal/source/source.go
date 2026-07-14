@@ -9,6 +9,7 @@ type PackageEntry struct {
 	PackageURL  string    `json:"registry_url,omitempty"`
 	IDs         []string  `json:"ids"`
 	Aliases     []string  `json:"aliases,omitempty"`
+	Source      string    `json:"source,omitempty"`
 	ModifiedAt  time.Time `json:"modified_at"`
 	Published   time.Time `json:"published_at,omitempty"`
 	ImportedAt  time.Time `json:"imported_at,omitempty"`

@@ -78,7 +78,7 @@ func TestWriteFeedCardHeaderOnlyListMode(t *testing.T) {
 	if !strings.Contains(out, "[MAL-2023-8169]") || !strings.Contains(out, "apka-papa-chand") || !strings.Contains(out, "(npm)") {
 		t.Fatalf("expected header line content:\n%s", out)
 	}
-	if strings.Contains(out, "Published:") || strings.Contains(out, "OSV:") || strings.Contains(out, "Package:") {
+	if strings.Contains(out, "Published:") || strings.Contains(out, "Source:") || strings.Contains(out, "Package:") {
 		t.Fatalf("list mode must omit detail lines:\n%s", out)
 	}
 	if n := strings.Count(strings.TrimSpace(out), "\n"); n != 0 {
@@ -104,8 +104,8 @@ func TestWriteIDCardIncludesPackageURL(t *testing.T) {
 	if !strings.Contains(out, "Package: https://pypi.org/project/apkeep/") {
 		t.Fatalf("missing package URL in id card:\n%s", out)
 	}
-	if !strings.Contains(out, "OSV: https://osv.dev/vulnerability/MAL-2026-3431") {
-		t.Fatalf("missing OSV link in id card:\n%s", out)
+	if !strings.Contains(out, "Source: https://osv.dev/vulnerability/MAL-2026-3431") {
+		t.Fatalf("missing Source link in id card:\n%s", out)
 	}
 	assertFeedCardDetailOrder(t, out)
 }
@@ -158,7 +158,7 @@ func TestWriteCheckCardQuarantinedIncludesDetails(t *testing.T) {
 		"nodemon-webpatch",
 		"(npm)",
 		"Package: https://www.npmjs.com/package/nodemon-webpatch",
-		"OSV: https://osv.dev/vulnerability/MAL-2026-5180",
+		"Source: https://osv.dev/vulnerability/MAL-2026-5180",
 	} {
 		if !strings.Contains(out, want) {
 			t.Fatalf("missing %q in output:\n%s", want, out)
@@ -187,7 +187,7 @@ func TestWriteFeedCardQuarantinedIncludesDetails(t *testing.T) {
 		"QUARANTINED",
 		"nodemon-webpatch",
 		"Package: https://www.npmjs.com/package/nodemon-webpatch",
-		"OSV: https://osv.dev/vulnerability/MAL-2026-5180",
+		"Source: https://osv.dev/vulnerability/MAL-2026-5180",
 	} {
 		if !strings.Contains(out, want) {
 			t.Fatalf("missing %q in output:\n%s", want, out)
@@ -205,11 +205,11 @@ func assertFeedCardDetailOrder(t *testing.T, out string) {
 		t.Fatalf("Withdrawn line should be omitted from card:\n%s", out)
 	}
 	pkg := strings.Index(out, "Package:")
-	osvLine := strings.Index(out, "OSV:")
-	if pkg < 0 || osvLine < 0 {
+	srcLine := strings.Index(out, "Source:")
+	if pkg < 0 || srcLine < 0 {
 		t.Fatalf("missing expected detail lines:\n%s", out)
 	}
-	if pkg >= osvLine {
-		t.Fatalf("expected Package → OSV order:\n%s", out)
+	if pkg >= srcLine {
+		t.Fatalf("expected Package → Source order:\n%s", out)
 	}
 }

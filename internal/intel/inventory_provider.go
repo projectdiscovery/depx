@@ -3,12 +3,10 @@ package intel
 import (
 	"context"
 	"fmt"
-	"strings"
 	gosync "sync"
 	"time"
 
 	"github.com/projectdiscovery/depx/internal/config"
-	"github.com/projectdiscovery/depx/internal/inventory"
 	"github.com/projectdiscovery/depx/internal/malindex"
 	"github.com/projectdiscovery/depx/internal/registry"
 	"github.com/projectdiscovery/depx/internal/source"
@@ -129,10 +127,7 @@ func derefVulns(in []*malindex.Vulnerability) []malindex.Vulnerability {
 }
 
 func (p *provider) VulnPageURL(id string) string {
-	if strings.HasPrefix(id, "MAL-") {
-		return malindex.VulnPageURL(id)
-	}
-	return inventory.PackagePageURL(id)
+	return malindex.VulnPageURL(id)
 }
 
 func (p *provider) Feed(ctx context.Context, req FeedRequest) (*FeedResponse, error) {
@@ -190,6 +185,7 @@ func (p *provider) entryFromHit(h malindex.SearchHit) source.PackageEntry {
 		Name:       h.Name,
 		IDs:        append([]string(nil), h.IDs...),
 		Aliases:    append([]string(nil), h.Aliases...),
+		Source:     h.Source,
 		Summary:    h.Summary,
 		Published:  h.Published,
 		ModifiedAt: h.Modified,

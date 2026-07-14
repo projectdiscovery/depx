@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/projectdiscovery/depx/internal/audit"
+	"github.com/projectdiscovery/depx/internal/malindex"
 )
 
 const (
@@ -209,8 +210,8 @@ func sarifHelpURI(f audit.Finding) string {
 		if id == "" {
 			continue
 		}
-		if strings.HasPrefix(id, "MAL-") || strings.HasPrefix(id, "GHSA-") || strings.HasPrefix(id, "CVE-") {
-			return "https://osv.dev/vulnerability/" + id
+		if u := malindex.VulnPageURL(id); u != "" {
+			return u
 		}
 	}
 	return f.ProjectURL

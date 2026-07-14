@@ -40,7 +40,7 @@ func TestWriteAuditFindingCard(t *testing.T) {
 		"(npm)",
 		"Lockfile: /tmp/project/package-lock.json",
 		"Dependency: npm/evil-pkg@1.2.3",
-		"OSV:",
+		"Source:",
 	} {
 		if !strings.Contains(out, want) {
 			t.Fatalf("missing %q in output:\n%s", want, out)
@@ -73,7 +73,7 @@ func TestWriteAuditFindingCardQuarantined(t *testing.T) {
 		"Lockfile:",
 		"Dependency:",
 		"Package: https://www.npmjs.com/package/nodemon-webpatch",
-		"OSV:",
+		"Source:",
 	} {
 		if !strings.Contains(out, want) {
 			t.Fatalf("missing %q in output:\n%s", want, out)
