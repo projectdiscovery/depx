@@ -18,8 +18,13 @@ if ! grep -q '^Vulnerability #' "$out"; then
 fi
 
 # Only these OSV entries are currently allowed: no fixed release exists yet
-# (govulncheck reports "Fixed in: N/A") and they come from osv-scalibr → docker.
-allowed=(GO-2026-4887 GO-2026-4883)
+# (govulncheck reports "Fixed in: N/A") and they come from osv-scalibr's
+# transitive docker / containerd deps plus the unmaintained x/crypto/openpgp.
+allowed=(
+	GO-2026-4883 GO-2026-4887 GO-2026-5617 GO-2026-5668 GO-2026-5746 # docker/docker
+	GO-2026-5064 GO-2026-5338 GO-2026-5622                           # containerd
+	GO-2026-5932                                                     # x/crypto openpgp (unmaintained)
+)
 for id in $(grep -oE 'GO-[0-9-]+' "$out" | sort -u); do
 	ok=0
 	for allow in "${allowed[@]}"; do
