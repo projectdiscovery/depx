@@ -110,8 +110,8 @@ func TestCLI(t *testing.T) {
 		if code != 0 {
 			t.Fatalf("exit %d: %s", code, out)
 		}
-		if !strings.Contains(out, `"verdict": "malicious"`) {
-			t.Fatalf("expected malicious: %s", out)
+		if !strings.Contains(out, `"verdict": "quarantined"`) {
+			t.Fatalf("expected quarantined: %s", out)
 		}
 		if !strings.Contains(out, `"url": "https://osv.dev/vulnerability/MAL-2026-TEST1"`) {
 			t.Fatalf("expected advisory url: %s", out)

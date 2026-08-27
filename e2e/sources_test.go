@@ -65,8 +65,8 @@ func TestE2EIntelSource(t *testing.T) {
 			t.Fatalf("exit %d: %s", code, out)
 		}
 		assertJSONCommand(t, out, "check")
-		if !strings.Contains(out, `"verdict": "malicious"`) {
-			t.Fatalf("expected malicious: %s", out)
+		if !strings.Contains(out, `"verdict": "quarantined"`) {
+			t.Fatalf("expected quarantined: %s", out)
 		}
 	})
 
