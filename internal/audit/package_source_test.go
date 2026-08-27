@@ -10,9 +10,9 @@ import (
 func TestPackageToDependencyUsesAbsoluteLockfilePath(t *testing.T) {
 	lockfile := filepath.Join(t.TempDir(), "package-lock.json")
 	pkg := &extractor.Package{
-		Name:      "evil",
-		Version:   "1.0.0",
-		Locations: []string{"package-lock.json"},
+		Name:     "evil",
+		Version:  "1.0.0",
+		Location: extractor.LocationFromPath("package-lock.json"),
 	}
 
 	dep := packageToDependency(pkg, lockfile, SourceTypeLockfile, "")

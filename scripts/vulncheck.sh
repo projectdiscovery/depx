@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
-# Run govulncheck and allow known unfixed transitive findings from osv-scalibr
-# (docker/moby pulled in via init-time dependency graph, not depx code paths).
+# Run govulncheck and allow the known unfixed OpenPGP finding.
 set -euo pipefail
 
 root="$(cd "$(dirname "$0")/.." && pwd)"
@@ -17,13 +16,10 @@ if ! grep -q '^Vulnerability #' "$out"; then
 	exit 0
 fi
 
-# Only these OSV entries are currently allowed: no fixed release exists yet
-# (govulncheck reports "Fixed in: N/A") and they come from osv-scalibr's
-# transitive docker / containerd deps plus the unmaintained x/crypto/openpgp.
+# OpenPGP is reached through the existing self-update implementation. The
+# vulnerability database reports no fixed release.
 allowed=(
-	GO-2026-4883 GO-2026-4887 GO-2026-5617 GO-2026-5668 GO-2026-5746 # docker/docker
-	GO-2026-5064 GO-2026-5338 GO-2026-5622                           # containerd
-	GO-2026-5932                                                     # x/crypto openpgp (unmaintained)
+	GO-2026-5932 # x/crypto openpgp (unmaintained)
 )
 for id in $(grep -oE 'GO-[0-9-]+' "$out" | sort -u); do
 	ok=0
@@ -39,5 +35,5 @@ for id in $(grep -oE 'GO-[0-9-]+' "$out" | sort -u); do
 done
 
 echo
-echo "govulncheck: ignoring ${allowed[*]} (unfixed transitive osv-scalibr/docker findings)"
+echo "govulncheck: ignoring ${allowed[*]} (unfixed OpenPGP finding)"
 exit 0
