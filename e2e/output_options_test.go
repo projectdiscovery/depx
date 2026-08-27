@@ -144,8 +144,8 @@ func TestE2EAuditOutputOptions(t *testing.T) {
 		if len(doc.Runs[0].Results) == 0 {
 			t.Fatalf("expected at least one SARIF result for malicious dependency:\n%s", raw)
 		}
-		if doc.Runs[0].Results[0].Level != "error" {
-			t.Fatalf("malicious result level = %q, want error", doc.Runs[0].Results[0].Level)
+		if doc.Runs[0].Results[0].Level != "note" {
+			t.Fatalf("quarantined result level = %q, want note", doc.Runs[0].Results[0].Level)
 		}
 	})
 
@@ -193,8 +193,8 @@ func TestE2EAuditOutputOptions(t *testing.T) {
 		if !strings.Contains(string(raw), "verdict,ecosystem") {
 			t.Fatalf("unexpected csv header: %s", raw)
 		}
-		if !strings.Contains(string(raw), "malicious") {
-			t.Fatalf("expected malicious finding row in csv: %s", raw)
+		if !strings.Contains(string(raw), "quarantined") {
+			t.Fatalf("expected quarantined finding row in csv: %s", raw)
 		}
 	})
 
