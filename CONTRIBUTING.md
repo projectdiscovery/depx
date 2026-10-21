@@ -4,7 +4,7 @@ Thanks for helping improve depx. This project follows the same conventions as ot
 
 ## Development setup
 
-Requires **Go 1.25+**.
+Requires **Go 1.26.10+**.
 
 ```bash
 git clone https://github.com/projectdiscovery/depx.git

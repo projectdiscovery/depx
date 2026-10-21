@@ -53,7 +53,7 @@ curl -sfL https://raw.githubusercontent.com/projectdiscovery/depx/main/scripts/i
 
 Downloads the latest release for your OS/arch (or builds with `go install` as fallback). The script verifies the binary and updates your shell `PATH` when needed.
 
-**From source** (requires **Go 1.25+**):
+**From source** (requires **Go 1.26.10+**):
 
 ```bash
 git clone https://github.com/projectdiscovery/depx.git
