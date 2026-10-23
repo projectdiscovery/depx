@@ -1,6 +1,6 @@
 module github.com/projectdiscovery/depx
 
-go 1.26.6
+go 1.27.3
 
 require (
 	deps.dev/util/semver v0.0.0-20260529052642-cf1e78d92744
