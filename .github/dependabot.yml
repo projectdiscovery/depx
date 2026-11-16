@@ -11,6 +11,9 @@ updates:
       prefix: chore
       include: scope
     labels:
-      - Type: Maintenance
+      - "Type: Maintenance"
     allow:
       - dependency-name: github.com/projectdiscovery/*
+    groups:
+      projectdiscovery:
+        patterns: ["github.com/projectdiscovery/*"]
