@@ -140,7 +140,7 @@ Workflows match other ProjectDiscovery Go CLIs (`subfinder`, `httpx`):
 | `build-test.yml` | PR (Go changes) | golangci-lint, gofmt, govulncheck, cross-OS build/test/race |
 | `release-test.yml` | PR | GoReleaser snapshot build |
 | `release-binary.yml` | `v*` tag push | GoReleaser release (binaries) |
-| `dep-auto-merge.yml` | Dependabot PRs | Auto-merge dependency updates |
+| `dependabot-auto-merge.yaml` | Dependabot PRs | Auto-merge dependency updates |
 
 **Local CI gate:** run `make ci` before commit. It mirrors `build-test.yml` on one machine:
 
@@ -153,7 +153,7 @@ make ci
 
 `make lint` downloads the official golangci-lint binary (Go 1.25–compatible). Do not use a Homebrew/`go install` linter built with Go 1.24 against this repo.
 
-Release optional secrets: `RELEASE_SLACK_WEBHOOK`, `DISCORD_WEBHOOK_*`, `DEPENDABOT_PAT`.
+Release optional secrets: `RELEASE_SLACK_WEBHOOK`, `DISCORD_WEBHOOK_*`.
 
 ## Adding a new root lockfile
 
