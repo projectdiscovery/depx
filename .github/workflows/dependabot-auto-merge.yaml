@@ -3,7 +3,7 @@ name: 🔀 Auto merge PR
 on:
   pull_request:
     branches:
-      - main
+      - dev
 
 jobs:
   dependabot:
