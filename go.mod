@@ -6,7 +6,7 @@ require (
 	deps.dev/util/semver v0.0.0-20250903005441-604c45d5b44b
 	github.com/google/osv-scalibr v0.4.5
 	github.com/logrusorgru/aurora v2.0.3+incompatible
-	github.com/projectdiscovery/utils v0.11.14
+	github.com/projectdiscovery/utils v0.11.15
 	github.com/spf13/cobra v1.10.2
 	gopkg.in/yaml.v3 v3.0.1
 )
@@ -142,8 +142,8 @@ require (
 	github.com/pkg/xattr v0.4.9 // indirect
 	github.com/planetscale/vtprotobuf v0.6.1-0.20240319094008-0393e58bdf10 // indirect
 	github.com/power-devops/perfstat v0.0.0-20240221224432-82ca36839d55 // indirect
-	github.com/projectdiscovery/blackrock v0.0.2 // indirect
-	github.com/projectdiscovery/gologger v1.1.75 // indirect
+	github.com/projectdiscovery/blackrock v0.0.4 // indirect
+	github.com/projectdiscovery/gologger v1.1.76 // indirect
 	github.com/projectdiscovery/machineid v0.0.0-20250715113114-c77eb3567582 // indirect
 	github.com/remyoudompheng/bigfft v0.0.0-20230129092748-24d4a6f8daec // indirect
 	github.com/rivo/uniseg v0.4.7 // indirect
